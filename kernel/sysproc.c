@@ -7,6 +7,16 @@
 #include "proc.h"
 
 uint64
+sys_cwd(void)
+{
+  struct proc *p = myproc();
+  uint64 addr;
+  argaddr(0, &addr);
+  char *path = p->cwdpath;
+  return copyout(p->pagetable, addr, path, strlen(path));
+}
+
+uint64
 sys_exit(void)
 {
   int n;

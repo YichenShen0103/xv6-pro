@@ -410,6 +410,7 @@ uint64
 sys_chdir(void)
 {
   char path[MAXPATH];
+  memset(path, 0, MAXPATH);
   struct inode *ip;
   struct proc *p = myproc();
   
@@ -428,6 +429,13 @@ sys_chdir(void)
   iput(p->cwd);
   end_op();
   p->cwd = ip;
+  if (path[0] == '/') {
+    safestrcpy(p->cwdpath, path, MAXPATH);
+  } else {
+    stradd(p->cwdpath, "/");
+    stradd(p->cwdpath, path);
+  }
+  update_path(p->cwdpath);
   return 0;
 }
 

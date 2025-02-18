@@ -105,3 +105,28 @@ strlen(const char *s)
   return n;
 }
 
+char* stradd(char *s, const char *t)
+{
+  int n1 = strlen(s), n2 = strlen(t);
+  
+  // 动态分配内存，足够容纳 s + t + 1 个字符
+  char ns[512];  
+
+  // 复制 s
+  for (int i = 0; i < n1; i++) {
+    ns[i] = s[i];
+  }
+
+  // 复制 t
+  for (int i = 0; i < n2; i++) {
+    ns[n1 + i] = t[i];
+  }
+
+  // 确保字符串以 '\0' 结尾
+  ns[n1 + n2] = '\0';
+
+  // 使用 strncpy 把拼接结果复制回 s
+  strncpy(s, ns, n1 + n2 + 1);  // 确保不会超出 s 的原始长度
+
+  return s;
+}

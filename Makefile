@@ -22,6 +22,7 @@ OBJS = \
   $K/fs.o \
   $K/log.o \
   $K/sleeplock.o \
+  $K/util.o \
   $K/file.o \
   $K/pipe.o \
   $K/exec.o \
@@ -132,6 +133,7 @@ UPROGS=\
 	$U/_ln\
 	$U/_ls\
 	$U/_mkdir\
+	$U/_pwd\
 	$U/_rm\
 	$U/_sh\
 	$U/_stressfs\
