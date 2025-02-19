@@ -17,6 +17,40 @@ extern char etext[];  // kernel.ld sets this to end of kernel code.
 
 extern char trampoline[]; // trampoline.S
 
+// 检查一个地址指向的页是否是懒复制页
+int uvmcheckcowpage(uint64 va) {
+  pte_t *pte;
+  struct proc *p = myproc();
+  
+  return va < p->sz // 在进程内存范围内
+    && ((pte = walk(p->pagetable, va, 0))!=0)
+    && (*pte & PTE_V) // 页表项存在
+    && (*pte & PTE_COW); // 页是一个懒复制页
+}
+
+// 实复制一个懒复制页，并重新映射为可写
+int uvmcowcopy(uint64 va) {
+  pte_t *pte;
+  struct proc *p = myproc();
+
+  if((pte = walk(p->pagetable, va, 0)) == 0)
+    panic("uvmcowcopy: walk");
+  
+  // 调用 kalloc.c 中的 kcopy_n_deref 方法，复制页
+  // (如果懒复制页的引用已经为 1，则不需要重新分配和复制内存页，只需清除 PTE_COW 标记并标记 PTE_W 即可)
+  uint64 pa = PTE2PA(*pte);
+  uint64 new = (uint64)kcopy_n_deref((void*)pa); // 将一个懒复制的页引用变为一个实复制的页
+  if(new == 0)
+    return -1;
+  
+  // 重新映射为可写，并清除 PTE_COW 标记
+  uint64 flags = (PTE_FLAGS(*pte) | PTE_W) & ~PTE_COW;
+  uvmunmap(p->pagetable, PGROUNDDOWN(va), 1, 0);
+  if(mappages(p->pagetable, PGROUNDDOWN(va), PGSIZE, new, flags) == -1)
+    panic("uvmcowcopy: mappages");
+  return 0;
+}
+
 // Make a direct-map page table for the kernel.
 pagetable_t
 kvmmake(void)
@@ -317,7 +351,6 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   pte_t *pte;
   uint64 pa, i;
   uint flags;
-  char *mem;
 
   for(i = 0; i < sz; i += PGSIZE){
     if((pte = walk(old, i, 0)) == 0)
@@ -325,14 +358,15 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     if((*pte & PTE_V) == 0)
       continue;
     pa = PTE2PA(*pte);
+    if(*pte & PTE_W) 
+      *pte = (*pte & ~PTE_W) | PTE_COW;
     flags = PTE_FLAGS(*pte);
-    if((mem = kalloc()) == 0)
+    // if((mem = kalloc()) == 0)
+    //   goto err;
+    // memmove(mem, (char*)pa, PGSIZE);
+    if(mappages(new, i, PGSIZE, (uint64)pa, flags) != 0)
       goto err;
-    memmove(mem, (char*)pa, PGSIZE);
-    if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
-      kfree(mem);
-      goto err;
-    }
+    krefpage((void*)pa);
   }
   return 0;
 
@@ -367,6 +401,8 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
     uvmlazytouch(dstva);
 
   while(len > 0){
+    if (uvmcheckcowpage(dstva))
+      uvmcowcopy(dstva);
     va0 = PGROUNDDOWN(dstva);
     if(va0 >= MAXVA)
       return -1;

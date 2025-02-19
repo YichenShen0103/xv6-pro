@@ -63,6 +63,8 @@ void            ramdiskrw(struct buf*);
 void*           kalloc(void);
 void            kfree(void *);
 void            kinit(void);
+void*           kcopy_n_deref(void *);
+void            krefpage(void *);
 
 // log.c
 void            initlog(int, struct superblock*);
@@ -176,6 +178,8 @@ int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
 void            uvmlazytouch(uint64);
 int             uvmshouldtouch(uint64);
+int             uvmcowcopy(uint64);
+int             uvmcheckcowpage(uint64);
 
 // plic.c
 void            plicinit(void);
