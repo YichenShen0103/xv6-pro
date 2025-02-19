@@ -12,6 +12,10 @@
 #define BACK  5
 
 #define MAXARGS 10
+#define MAXENV 64
+
+char *envp[MAXENV];
+int cnt_envp = 0;
 
 struct cmd {
   int type;
@@ -76,6 +80,11 @@ runcmd(struct cmd *cmd)
     ecmd = (struct execcmd*)cmd;
     if(ecmd->argv[0] == 0)
       exit(1);
+    for (int i = 0; i < cnt_envp; i++) {
+      char *p = envp[i];
+      stradd(p, ecmd->argv[0]);
+      exec(p, ecmd->argv);
+    }
     exec(ecmd->argv[0], ecmd->argv);
     fprintf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
@@ -163,7 +172,7 @@ int
 main(void)
 {
   static char buf[100];
-  int fd;
+  int fd, env;
 
   // Ensure that three file descriptors are open.
   while((fd = open("console", O_RDWR)) >= 0){
@@ -171,6 +180,22 @@ main(void)
       close(fd);
       break;
     }
+  }
+
+  if ((env = open("/.shrc", O_RDONLY)) >= 0) {
+    char envbuf[256];
+    memset(envbuf, 0, 256);
+    read(env, envbuf, 256);
+    char *p = envbuf;
+    while (*p != 0) {
+      envp[cnt_envp++] = p;
+      while (*p != '\n' && *p != 0)
+        p++;
+      if (*p == '\n')
+        *p++ = 0;
+    }
+    envp[cnt_envp] = 0;
+    close(env);
   }
 
   // Read and run input commands.

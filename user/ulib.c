@@ -43,6 +43,22 @@ strlen(const char *s)
   return n;
 }
 
+char* 
+stradd(char *s, const char *t)
+{
+  int n1 = strlen(s), n2 = strlen(t);
+  char ns[512];  
+
+  for (int i = 0; i < n1; i++)
+    ns[i] = s[i];
+  for (int i = 0; i < n2; i++)
+    ns[n1 + i] = t[i];
+  ns[n1 + n2] = '\0';
+  strcpy(s, ns);
+
+  return s;
+}
+
 void*
 memset(void *dst, int c, uint n)
 {
