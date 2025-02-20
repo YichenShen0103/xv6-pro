@@ -2628,7 +2628,7 @@ struct test {
   {subdir, "subdir"},
   {bigwrite, "bigwrite"},
   {bigfile, "bigfile"},
-  // {fourteen, "fourteen"},
+  {fourteen, "fourteen"},
   {rmdot, "rmdot"},
   {dirfile, "dirfile"},
   {iref, "iref"},
