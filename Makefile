@@ -3,6 +3,10 @@ U=user
 
 OBJS = \
   $K/entry.o \
+  $K/e1000.o \
+  $K/net.o \
+  $K/sysnet.o \
+  $K/pci.o \
   $K/start.o \
   $K/console.o \
   $K/printf.o \
@@ -133,6 +137,7 @@ UPROGS=\
 	$U/_ln\
 	$U/_ls\
 	$U/_mkdir\
+	$U/_nettests\
 	$U/_pwd\
 	$U/_rm\
 	$U/_sh\

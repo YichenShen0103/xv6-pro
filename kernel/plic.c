@@ -25,6 +25,8 @@ plicinithart(void)
   // for the uart and virtio disk.
   *(uint32*)PLIC_SENABLE(hart) = (1 << UART0_IRQ) | (1 << VIRTIO0_IRQ);
 
+  *(uint32*)PLIC_SENABLE(hart+4) = 0xffffffff;
+
   // set this hart's S-mode priority threshold to 0.
   *(uint32*)PLIC_SPRIORITY(hart) = 0;
 }
