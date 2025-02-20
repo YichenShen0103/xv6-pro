@@ -125,8 +125,7 @@ char* stradd(char *s, const char *t)
   // 确保字符串以 '\0' 结尾
   ns[n1 + n2] = '\0';
 
-  // 使用 strncpy 把拼接结果复制回 s
-  strncpy(s, ns, n1 + n2 + 1);  // 确保不会超出 s 的原始长度
+  safestrcpy(s, ns, n1 + n2 + 1);  // 确保不会超出 s 的原始长度
 
   return s;
 }

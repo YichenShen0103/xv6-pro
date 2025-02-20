@@ -22,7 +22,7 @@ int update_path(char *path) {
             } else {
                 if (len >= MAX_SEGMENT_LENGTH) // 检查段长度是否超出限制
                     return -1;
-                strncpy(stack[top], slow, len);
+                safestrcpy(stack[top], slow, len);
                 stack[top][len] = '\0'; // 手动添加终止符
                 top++;
             }
@@ -41,7 +41,7 @@ int update_path(char *path) {
     } else if (len > 0) {
         if (len >= MAX_SEGMENT_LENGTH) // 检查段长度是否超出限制
             return -1;
-        strncpy(stack[top], slow, len);
+        safestrcpy(stack[top], slow, len);
         stack[top][len] = '\0'; // 手动添加终止符
         top++;
     }
