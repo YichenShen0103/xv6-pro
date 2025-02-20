@@ -1,0 +1,31 @@
+name: Run Test Script
+
+on:
+  push:
+    branches:
+      - develop
+      - riscv
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest  # 可以使用 Ubuntu 环境来执行脚本，也可以使用其他系统（例如 Windows 或 macOS）
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2  # 检出代码
+
+    - name: Set up the environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bash  # 确保 Bash 环境可用
+        sudo apt-get install -y make  # 确保 Make 环境可用
+        sudo apt-get install -y gcc  # 确保 GCC 环境可用
+        sudo apt-get install -y build-essential qemu-system-misc gcc-riscv64-linux-gnu binutils-riscv64-linux-gnu 
+        sudo apt-get install -y expect
+        sudo apt-get install -y python3
+        sudo apt-get install -y python3-pip
+        pip3 install datetime pexpect
+
+    - name: Run the test script
+      run: |
+        python3 ./run_test.py  # 执行你的脚本

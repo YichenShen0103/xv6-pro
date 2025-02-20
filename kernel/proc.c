@@ -248,7 +248,7 @@ userinit(void)
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
-  strncpy(p->cwdpath, "/", 512);
+  safestrcpy(p->cwdpath, "/", 512);
 
   p->state = RUNNABLE;
 
@@ -308,7 +308,7 @@ fork(void)
     if(p->ofile[i])
       np->ofile[i] = filedup(p->ofile[i]);
   np->cwd = idup(p->cwd);
-  strncpy(np->cwdpath, p->cwdpath, 512);
+  safestrcpy(np->cwdpath, p->cwdpath, 512);
 
   safestrcpy(np->name, p->name, sizeof(p->name));
 
