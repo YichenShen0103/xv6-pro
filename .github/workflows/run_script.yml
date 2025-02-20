@@ -24,7 +24,7 @@ jobs:
         sudo apt-get install -y expect
         sudo apt-get install -y python3
         sudo apt-get install -y python3-pip
-        pip3 install os sys subprocess datetime pexpect
+        pip3 datetime pexpect
 
     - name: Run the test script
       run: |
