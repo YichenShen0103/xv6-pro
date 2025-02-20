@@ -21,9 +21,11 @@ jobs:
         sudo apt-get install -y make  # 确保 Make 环境可用
         sudo apt-get install -y gcc  # 确保 GCC 环境可用
         sudo apt-get install -y build-essential qemu-system-misc gcc-riscv64-linux-gnu binutils-riscv64-linux-gnu 
-
+        sudo apt-get install -y expect
+        sudo apt-get install -y python3
+        sudo apt-get install -y python3-pip
+        pip3 install os sys subprocess datetime pexpect
 
     - name: Run the test script
       run: |
-        chmod +x ./run_test.sh  # 确保脚本有执行权限
-        ./run_test.sh  # 执行你的脚本
+        python3 ./run_test.py  # 执行你的脚本
